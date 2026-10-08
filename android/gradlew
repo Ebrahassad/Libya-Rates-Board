@@ -1,0 +1,32 @@
+#!/bin/sh
+set -eu
+
+APP_HOME=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+WRAPPER_DIR="$APP_HOME/gradle/wrapper"
+JAR="$WRAPPER_DIR/gradle-wrapper.jar"
+VERSION="9.3.1"
+URL="https://raw.githubusercontent.com/gradle/gradle/v${VERSION}/gradle/wrapper/gradle-wrapper.jar"
+
+mkdir -p "$WRAPPER_DIR"
+
+if [ ! -s "$JAR" ]; then
+  echo "Gradle wrapper JAR not found. Downloading Gradle ${VERSION} wrapper..."
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$URL" -o "$JAR"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q "$URL" -O "$JAR"
+  else
+    echo "ERROR: curl or wget is required to bootstrap Gradle wrapper." >&2
+    exit 1
+  fi
+fi
+
+if [ ! -s "$JAR" ]; then
+  echo "ERROR: Could not obtain gradle-wrapper.jar" >&2
+  exit 1
+fi
+
+exec java ${JAVA_OPTS:-} \
+  -Dorg.gradle.appname=gradlew \
+  -classpath "$JAR" \
+  org.gradle.wrapper.GradleWrapperMain "$@"

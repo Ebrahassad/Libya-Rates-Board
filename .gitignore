@@ -1,0 +1,45 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Generated
+*.iml
+.idea/
+.vscode/
+
+# Android local configuration
+android/local.properties
+android/.gradle/
+android/captures/
+android/app/debug/
+android/app/profile/
+android/app/release/
+android/key.properties
+android/*.jks
+android/*.keystore
+
+# Secrets
+.env
+.env.*
+!.env.example
+FULUS_API_TOKEN
+FULUS_API_TOKEN.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# Temporary
+tmp/
+temp/

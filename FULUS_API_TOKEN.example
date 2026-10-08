@@ -1,0 +1,9 @@
+This file is only a reminder.
+Do not put the real token here.
+
+For local:
+flutter run --dart-define=FULUS_API_TOKEN=YOUR_TOKEN
+
+For GitHub:
+Settings -> Secrets and variables -> Actions -> New repository secret
+Name: FULUS_API_TOKEN
