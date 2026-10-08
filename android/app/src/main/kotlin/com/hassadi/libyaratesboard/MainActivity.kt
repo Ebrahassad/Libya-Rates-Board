@@ -31,7 +31,6 @@ class MainActivity : FlutterActivity() {
     private fun openCastSettings(): Boolean {
         val intents = listOf(
             Intent(Settings.ACTION_CAST_SETTINGS),
-            Intent(Settings.ACTION_WIRELESS_DISPLAY_SETTINGS),
             Intent(Settings.ACTION_SETTINGS),
         )
 
