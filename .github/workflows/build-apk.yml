@@ -46,12 +46,28 @@ jobs:
         env:
           FULUS_API_TOKEN: ${{ secrets.FULUS_API_TOKEN }}
         run: |
+          set +e
+
           if [ -n "$FULUS_API_TOKEN" ]; then
             flutter build apk --release \
               --dart-define="FULUS_API_TOKEN=$FULUS_API_TOKEN"
           else
             flutter build apk --release
           fi
+
+          BUILD_EXIT=$?
+
+          echo
+          echo "===== FLUTTER BUILD EXIT CODE ====="
+          echo "$BUILD_EXIT"
+
+          if [ "$BUILD_EXIT" -ne 0 ]; then
+            echo
+            echo "Flutter reported a failure."
+            echo "The next step will verify whether Gradle actually produced the APK."
+          fi
+
+          exit 0
 
       - name: Diagnose and normalize APK
         if: always()
