@@ -53,28 +53,47 @@ jobs:
             flutter build apk --release
           fi
 
-      - name: Locate and normalize APK
-        if: success()
+      - name: Diagnose and normalize APK
+        if: always()
         run: |
-          echo "===== SEARCHING FOR APK ====="
+          echo "===== ALL APK FILES ====="
+          find . -type f -name '*.apk' \
+            -not -path './.git/*' \
+            -print 2>/dev/null | sort || true
+
+          echo
+          echo "===== ALL AAB FILES ====="
+          find . -type f -name '*.aab' \
+            -not -path './.git/*' \
+            -print 2>/dev/null | sort || true
+
+          echo
+          echo "===== FLUTTER APK OUTPUT DIRECTORY ====="
+          find build/app/outputs/flutter-apk -maxdepth 2 -type f \
+            -print 2>/dev/null | sort || true
+
+          echo
+          echo "===== GRADLE APK OUTPUTS ====="
+          find android/app/build/outputs -maxdepth 6 -type f \
+            \( -name '*.apk' -o -name '*.aab' \) \
+            -print 2>/dev/null | sort || true
+
+          echo
+          echo "===== COMPLETE BUILD OUTPUTS ====="
+          find build -maxdepth 10 -type f \
+            -print 2>/dev/null | sort | head -500 || true
 
           APK_PATH="$(find . -type f -name '*.apk' \
             -not -path './.git/*' \
-            -print -quit)"
+            -print 2>/dev/null | head -1)"
 
           if [ -z "$APK_PATH" ]; then
-            echo "ERROR: No APK was produced."
             echo
-            echo "===== BUILD DIRECTORY ====="
-            find build -maxdepth 8 -type f 2>/dev/null | sort || true
-            echo
-            echo "===== ANDROID OUTPUTS ====="
-            find android -maxdepth 10 -type f \
-              \( -name '*.apk' -o -name '*.aab' \) \
-              -print 2>/dev/null | sort || true
+            echo "ERROR: NO APK FOUND"
             exit 1
           fi
 
+          echo
           echo "APK FOUND: $APK_PATH"
 
           mkdir -p build/app/outputs/flutter-apk
