@@ -47,29 +47,42 @@ jobs:
           FULUS_API_TOKEN: ${{ secrets.FULUS_API_TOKEN }}
         run: |
           if [ -n "$FULUS_API_TOKEN" ]; then
-            flutter build apk --release \
+            flutter build apk --release --no-daemon \
               --dart-define="FULUS_API_TOKEN=$FULUS_API_TOKEN"
           else
-            flutter build apk --release
+            flutter build apk --release --no-daemon
           fi
 
-      - name: Diagnose Android outputs
-        if: always()
+      - name: Locate and normalize APK
+        if: success()
         run: |
-          echo "===== BUILD DIRECTORY ====="
-          find build -maxdepth 6 -type f 2>/dev/null | sort || true
+          echo "===== SEARCHING FOR APK ====="
+
+          APK_PATH="$(find . -type f -name '*.apk' \
+            -not -path './.git/*' \
+            -print -quit)"
+
+          if [ -z "$APK_PATH" ]; then
+            echo "ERROR: No APK was produced."
+            echo
+            echo "===== BUILD DIRECTORY ====="
+            find build -maxdepth 8 -type f 2>/dev/null | sort || true
+            echo
+            echo "===== ANDROID OUTPUTS ====="
+            find android -maxdepth 10 -type f \
+              \( -name '*.apk' -o -name '*.aab' \) \
+              -print 2>/dev/null | sort || true
+            exit 1
+          fi
+
+          echo "APK FOUND: $APK_PATH"
+
+          mkdir -p build/app/outputs/flutter-apk
+          cp "$APK_PATH" build/app/outputs/flutter-apk/app-release.apk
 
           echo
-          echo "===== APK FILES ====="
-          find . -type f -name "*.apk" -print 2>/dev/null | sort || true
-
-          echo
-          echo "===== AAB FILES ====="
-          find . -type f -name "*.aab" -print 2>/dev/null | sort || true
-
-          echo
-          echo "===== GRADLE APK OUTPUTS ====="
-          find android -type f \( -name "*.apk" -o -name "*.aab" \) -print 2>/dev/null | sort || true
+          echo "===== FINAL APK ====="
+          ls -lh build/app/outputs/flutter-apk/app-release.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
