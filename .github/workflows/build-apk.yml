@@ -47,10 +47,10 @@ jobs:
           FULUS_API_TOKEN: ${{ secrets.FULUS_API_TOKEN }}
         run: |
           if [ -n "$FULUS_API_TOKEN" ]; then
-            flutter build apk --release --no-daemon \
+            flutter build apk --release \
               --dart-define="FULUS_API_TOKEN=$FULUS_API_TOKEN"
           else
-            flutter build apk --release --no-daemon
+            flutter build apk --release
           fi
 
       - name: Locate and normalize APK
